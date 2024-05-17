@@ -1,8 +1,5 @@
 package lab;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ParseHandler implements Handler {
     Handler next;
     ParseHandler(Handler handler){

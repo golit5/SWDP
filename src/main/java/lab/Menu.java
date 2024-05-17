@@ -1,6 +1,4 @@
 package lab;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ public class Menu {
 
     List<Class<? extends DrinkFactory>> factories = new ArrayList<Class<? extends DrinkFactory>>();
     List<String> selections = new ArrayList<String>();
+    List<Class<? extends PaymentStrategy>> payments = new ArrayList<Class<? extends PaymentStrategy>>();
 
     public static Menu getInstance(){
         if (instance == null) {
@@ -30,6 +29,9 @@ public class Menu {
         selections.add("You've selected black tea. Please enter the manufacturer (Lipton or other):");
         selections.add("You've selected coffee. Please enter the manufacturer (Nescafe or other):");
         selections.add("You've selected green tea. Please enter the manufacturer (Lipton or other):");
+        payments.add(DebitCardStrategy.class);
+        payments.add(CreditCardStrategy.class);
+        payments.add(SoulPaymentStrategy.class);
         instance = this;
     }
 
@@ -67,4 +69,16 @@ public class Menu {
             return true;
         }
 
+    public Class<? extends PaymentStrategy> choosePayment() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        System.out.println("Select your payment method:\n1. Credit Card\n2. Debit Card\nOther input means you are giving away your soul!");
+        String pchoice = scanner.next();
+        handler.setNext(null);
+        if(handler.handle(pchoice)) {
+            int choice = Integer.parseInt(pchoice);
+            if (choice > 0 && choice < 3) {
+                return payments.get(choice - 1);
+            }
+        }
+        return payments.get(2);
+    }
 }

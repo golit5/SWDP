@@ -7,15 +7,15 @@ import java.util.List;
 public class ShoppingCart {
 
 
-    private List<Drink> drinks;
+    private final List<Drink> drinks;
 
     public ShoppingCart() {
         this.drinks = new ArrayList<>();
     }
 
 
-    public void addDrink(DrinkFactory df, String manufactor){
-        addDrink(df.getDrink(manufactor));
+    public void addDrink(DrinkFactory df, String manufacturer){
+        addDrink(df.getDrink(manufacturer));
     }
     public void addDrink(Drink item) {
         drinks.add(item);

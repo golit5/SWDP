@@ -19,10 +19,15 @@ public class Main {
         }
         while (flag);
         menu.printTotalCost();
-        System.out.println("Enter your credit card number: ");
-        menu.pay(new CreditCardStrategyProxy(scanner.next()));
-
-
+        Class<? extends PaymentStrategy> ps =
+                menu.choosePayment();
+        if(ps != SoulPaymentStrategy.class){
+            System.out.println("Enter your card number: ");
+            menu.pay(new PaymentStrategyProxy((PaymentStrategy) ps.getConstructors()[0].newInstance(scanner.next())));
+        }
+        else
+            menu.pay(new PaymentStrategyProxy(ps.getConstructor().newInstance()));
+        return;
     }
 
 }
