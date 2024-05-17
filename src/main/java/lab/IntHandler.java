@@ -1,4 +1,8 @@
 package lab;
+
+import org.springframework.stereotype.Component;
+
+@Component
 public class IntHandler implements Handler {
     Handler next;
     IntHandler(Handler handler){

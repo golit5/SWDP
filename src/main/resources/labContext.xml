@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="logAsp" class="lab.LoggingAsp"/>
+
+    <aop:config>
+        <aop:aspect id="log" ref="logAsp">
+            <aop:pointcut id="aboba"
+                          expression="execution(public boolean lab.Menu.choose())"/>
+            <aop:around method="AroundMenuChoose" pointcut-ref="aboba"/>
+        </aop:aspect>
+    </aop:config>
+
+    <bean id="intHandler" class="lab.IntHandler" scope="singleton"/>
+
+    <bean id="parseHandler" class="lab.ParseHandler" scope="singleton">
+        <constructor-arg name="handler" ref="intHandler"/>
+    </bean>
+
+    <bean id="drinkVisitorProxy" class="lab.DrinkVisitorProxy" scope="prototype"/>
+
+    <bean id="menu" class="lab.Menu" scope="singleton">
+        <property name="visitor" ref="drinkVisitorProxy"/>
+        <property name="handler" ref="parseHandler" />
+    </bean>
+
+</beans>

@@ -1,4 +1,8 @@
 package lab;
+
+import org.springframework.stereotype.Component;
+
+@Component
 public class DrinkVisitorProxy implements Visitor {
     Visitor drinkVisitor;
 
