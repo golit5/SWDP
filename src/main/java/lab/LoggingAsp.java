@@ -6,11 +6,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-@Component
-@Aspect
+
 public class LoggingAsp {
 
-    @Around("execution(public boolean Menu.choose())")
+
     public Object AroundMenuChoose(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 
         System.out.println("Menu.choose() called");

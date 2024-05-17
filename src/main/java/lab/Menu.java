@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-@Component
+
 public class Menu {
     private static Menu instance = null;
-    private Visitor visitor;
+    private ShoppingCart cart;
     private Scanner scanner;
     private Handler handler;
 
@@ -32,9 +32,8 @@ public class Menu {
         selections.add("You've selected green tea. Please enter the manufacturer (Lipton or other):");
         instance = this;
     }
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
-    }
+
+    public void setCart(ShoppingCart cart){ this.cart = cart; }
     public void setScanner(Scanner scanner){
         this.scanner = scanner;
     }
@@ -44,11 +43,14 @@ public class Menu {
     public void greet(){
         System.out.println("Welcome to the drink menu!");
     }
+    public void pay(PaymentStrategy ps){
+        cart.pay(ps);
+    }
     public void advise(){
         System.out.println("Please select your drinks (1 for black tea, 2 for coffee, 3 for green tea, 0 for exit):");
     }
     public void printTotalCost(){
-        System.out.println("Total cost: $" + visitor.getTotalCost());
+        System.out.println("Total cost: $" + cart.calculateTotal());
     }
     public boolean choose() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
             String schoice = scanner.next();
@@ -61,7 +63,7 @@ public class Menu {
         DrinkFactory drinkFactory = factories.get(choice - 1).getConstructor().newInstance();
             System.out.println(selections.get(choice - 1));
         String manufacturer = scanner.next();
-            visitor.visit(drinkFactory, manufacturer);
+            cart.addDrink(drinkFactory, manufacturer);
             return true;
         }
 

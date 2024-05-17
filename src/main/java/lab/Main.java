@@ -8,9 +8,9 @@ public class Main {
     public static ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("labContext.xml");
 
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-
+        Scanner scanner = new Scanner(System.in);
         Menu menu = context.getBean("menu", Menu.class);
-        menu.setScanner(new Scanner(System.in));
+        menu.setScanner(scanner);
         menu.greet();
         boolean flag = true;
         do {
@@ -19,5 +19,10 @@ public class Main {
         }
         while (flag);
         menu.printTotalCost();
+        System.out.println("Enter your credit card number: ");
+        menu.pay(new CreditCardStrategyProxy(scanner.next()));
+
+
     }
+
 }

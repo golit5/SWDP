@@ -1,11 +1,13 @@
 package lab;
-import java.util.ArrayList;
-import java.util.List;
 
-// Посетитель, оценивающий стоимость заказа
-class DrinkVisitor implements Visitor {
+
+class CreditCardStrategy implements PaymentStrategy {
     private double totalCost = 0;
+    private String cardNumber;
 
+    public CreditCardStrategy(String cardNumber){this.cardNumber = cardNumber;}
+
+    public String getCardNumber(){return cardNumber;}
     @Override
     public void visit(DrinkFactory drinkFactory, String manufacturer) {
         Drink drink = drinkFactory.getDrink(manufacturer);
@@ -15,5 +17,10 @@ class DrinkVisitor implements Visitor {
     @Override
     public double getTotalCost() {
         return totalCost;
+    }
+
+    @Override
+    public void pay(double amount) {
+       return;
     }
 }

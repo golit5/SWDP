@@ -22,10 +22,11 @@
         <constructor-arg name="handler" ref="intHandler"/>
     </bean>
 
-    <bean id="drinkVisitorProxy" class="lab.DrinkVisitorProxy" scope="prototype"/>
+    <bean id="shoppingCart" class="lab.ShoppingCart" scope="prototype"/>
 
     <bean id="menu" class="lab.Menu" scope="singleton">
-        <property name="visitor" ref="drinkVisitorProxy"/>
+
+        <property name="cart" ref="shoppingCart"/>
         <property name="handler" ref="parseHandler" />
     </bean>
 
