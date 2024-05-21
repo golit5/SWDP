@@ -16,4 +16,8 @@ public class GreenTea implements Drink {
             return price;
         }
     }
+    @Override
+    public String toString(){
+        return "green tea";
+    }
 }

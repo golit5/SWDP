@@ -14,8 +14,9 @@ public class ShoppingCart {
     }
 
 
-    public void addDrink(DrinkFactory df, String manufacturer){
+    public Drink addDrink(DrinkFactory df, String manufacturer){
         addDrink(df.getDrink(manufacturer));
+        return df.getDrink(manufacturer);
     }
     public void addDrink(Drink item) {
         drinks.add(item);

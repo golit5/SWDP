@@ -13,8 +13,9 @@ public class PaymentStrategyProxy implements PaymentStrategy {
 
     @Override
     public void pay(double amount) {
+        System.out.println("Calling pay(" + amount + ")");
         paymentStrategy.pay(amount);
-        System.out.println("$" + amount + " paid with " + paymentStrategy.getPaymentDetails());
+        System.out.println("$" + amount + " successfully paid with " + paymentStrategy.getPaymentDetails());
     }
 }
 

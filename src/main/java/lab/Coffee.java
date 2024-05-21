@@ -17,4 +17,8 @@ class Coffee implements Drink {
             return price;
         }
     }
+    @Override
+    public String toString(){
+        return "coffee";
+    }
 }

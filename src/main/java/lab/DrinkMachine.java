@@ -1,75 +1,74 @@
 package lab;
 
+import java.util.Stack;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DrinkMachine {
-    private final int seats;
-    private final Semaphore waitingQueue;
-    private final Lock machineLock;
-    private final Condition machineReady;
-    private boolean isMachineSleeping;
-    private String currentDrink;
+public class DrinkMachine implements Runnable{
+    private static Semaphore machineSem;
+    private final Lock machineLock = new ReentrantLock();
+    private static int queueMax = 10;
+    private static int queueSize = 0;
+    private static final Lock queueLock = new ReentrantLock();
+    private static Stack<Order> orders = new Stack<Order>();
 
-    public DrinkMachine(int numberOfSeats) {
-        this.seats = numberOfSeats;
-        this.waitingQueue = new Semaphore(seats);
-        this.machineLock = new ReentrantLock();
-        this.machineReady = machineLock.newCondition();
-        this.isMachineSleeping = true;
+    public static Semaphore getMachineSem() {
+        return machineSem;
     }
-    public void serveDrink(int customerId, String drink, Drink manufacturer){
+
+    public static void setMachineSem(Semaphore machineSem) {
+        DrinkMachine.machineSem = machineSem;
+        DrinkMachine.machineSem.release(Main.machines.size());
+    }
+
+    public static int getQueueSize() {
+        return queueSize;
+    }
+
+    public static void incQueueSize() {
+        ++DrinkMachine.queueSize;
+    }
+
+    public static void decQueueSize() {
+        --DrinkMachine.queueSize;
+    }
+
+    public static Lock getQueueLock() {
+        return queueLock;
+    }
+
+    public static Stack<Order> getOrders() {
+        return orders;
+    }
+
+    public static int getQueueMax(){
+        return queueMax;
+    }
+
+    public static void setQueueMax(int queueMax) {
+        DrinkMachine.queueMax = queueMax;
+    }
+
+    @Override
+    public void run() {
         try {
-            if(waitingQueue.tryAcquire()) {
-                System.out.println("Customer " + customerId + "is waiting to get " + manufacturer + "'s " + drink + ".");
-                machineLock.lock();
-                try {
-                    if (isMachineSleeping){
-                        isMachineSleeping = false;
-                        currentDrink = drink;
-                        machineReady.signal();
-                        System.out.println("Customer " + customerId + "wakes up to the Drink Machen for " + manufacturer + "'s " + drink + "." );
-                    } else {
-                        currentDrink = drink;
-                    }
-                    System.out.println("Customer " + customerId + " is getting " + manufacturer + "'s " + drink + ".");
-
-                } finally {
+            while (true) {
+                if (Client.getClientSem().tryAcquire()) {
+                    queueLock.lock();
+                    Order order = orders.pop();
+                    --queueSize;
+                    queueLock.unlock();
+                    System.out.println("Client " + order.client.getClientId() + " is waiting to get a " + order.drink);
+                    machineLock.lock();
+                    Thread.sleep(500);
+                    System.out.println(order.drink + " was given to the client #" + order.client.getClientId());
                     machineLock.unlock();
-                    waitingQueue.release();
-                }
-            } else {
-                System.out.println("Customer " + customerId + "leave because the queue is full.");
-        }
-
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();}
-    }
-    public void operateMachine(Drink manufacturer) {
-        while (true){
-            machineLock.lock();
-            try {
-                while (isMachineSleeping) {
-                    try {
-                        System.out.println("Drink Machine is sleeping.");
-                        machineReady.await();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-                System.out.println("Drink Machine is preparing " + manufacturer + "'s " + currentDrink + "." );
-                Thread.sleep(3000); // Делем вид, что напиток делается.
-                System.out.println("Drink Machine finished serving " + manufacturer + "'s " + currentDrink + " and goes back to sleep.");
-                isMachineSleeping = true;
+                    machineSem.release();
+                } else Thread.sleep(1000);
+            }
         } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            } finally {
-                machineLock.unlock();
-            }
-            }
+            System.out.println("DM WAS INTERRUPTED BRO");
+        }
     }
 }

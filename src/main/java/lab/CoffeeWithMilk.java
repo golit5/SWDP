@@ -8,4 +8,8 @@ class CoffeeWithMilk extends DrinkDecorator {
     public double calculateCost() {
         return drink.calculateCost() + 0.7; // Цена за добавление молока
     }
+    @Override
+    public String toString(){
+        return "coffee with milk";
+    }
 }

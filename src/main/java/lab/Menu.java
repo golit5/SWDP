@@ -65,7 +65,7 @@ public class Menu {
         DrinkFactory drinkFactory = factories.get(choice - 1).getConstructor().newInstance();
             System.out.println(selections.get(choice - 1));
         String manufacturer = scanner.next();
-            cart.addDrink(drinkFactory, manufacturer);
+            Main.user.addDrink(cart.addDrink(drinkFactory, manufacturer));
             return true;
         }
 
