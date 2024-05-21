@@ -10,29 +10,21 @@ import java.util.concurrent.Semaphore;
 public class Main {
     public static ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("labContext.xml");
     public static Client user = new Client();
-    public static List<Thread> clients;
     public static List<Thread> machines;
     private static final int QMAX = 10;
-    private static final int CLIENTS = 2;
-    private static final int MACHINES = 1;
+    private static final int MACHINES = 2;
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Thread cs = new Thread(new ClientSpawner());
         DrinkMachine.setQueueMax(QMAX);
-        clients = new ArrayList<Thread>();
-        for (int i = 0; i < CLIENTS; i++) {
-            clients.add(new Thread(new Client()));
-        }
         Client.setClientSem(new Semaphore(DrinkMachine.getQueueMax()));
         machines = new ArrayList<Thread>();
         for (int i = 0; i < MACHINES; i++) {
             machines.add(new Thread(new DrinkMachine()));
         }
-        DrinkMachine.setMachineSem(new Semaphore(1));
-        for (int i = 0; i < CLIENTS; i++) {
-            clients.get(i).start();
-        }
         for (int i = 0; i < MACHINES; i++) {
             machines.get(i).start();
         }
+        cs.start();
         Scanner scanner = new Scanner(System.in);
         Menu menu = context.getBean("menu", Menu.class);
         menu.setScanner(scanner);
@@ -43,6 +35,7 @@ public class Main {
             flag = menu.choose();
         }
         while (flag);
+
         menu.printTotalCost();
         Class<? extends PaymentStrategy> ps =
                 menu.choosePayment();
@@ -52,9 +45,8 @@ public class Main {
         }
         else
             menu.pay(new PaymentStrategyProxy(ps.getConstructor().newInstance()));
-        for (int i = 0; i < CLIENTS; i++) {
-            clients.get(i).interrupt();
-        }
+
+        cs.interrupt();
         for (int i = 0; i < MACHINES; i++) {
             machines.get(i).interrupt();
         }

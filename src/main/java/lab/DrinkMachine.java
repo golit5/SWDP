@@ -1,25 +1,20 @@
 package lab;
 
-import java.util.Stack;
-import java.util.concurrent.Semaphore;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DrinkMachine implements Runnable{
-    private static Semaphore machineSem;
-    private final Lock machineLock = new ReentrantLock();
+    private final int machineId;
+    private static int idCounter = 0;
     private static int queueMax = 10;
     private static int queueSize = 0;
     private static final Lock queueLock = new ReentrantLock();
-    private static Stack<Order> orders = new Stack<Order>();
+    private static final Deque<Order> orders = new ArrayDeque<Order>();
 
-    public static Semaphore getMachineSem() {
-        return machineSem;
-    }
-
-    public static void setMachineSem(Semaphore machineSem) {
-        DrinkMachine.machineSem = machineSem;
-        DrinkMachine.machineSem.release(Main.machines.size());
+    public DrinkMachine() {
+        this.machineId = idCounter++;
     }
 
     public static int getQueueSize() {
@@ -27,18 +22,18 @@ public class DrinkMachine implements Runnable{
     }
 
     public static void incQueueSize() {
-        ++DrinkMachine.queueSize;
+        DrinkMachine.queueSize++;
     }
 
     public static void decQueueSize() {
-        --DrinkMachine.queueSize;
+        DrinkMachine.queueSize--;
     }
 
     public static Lock getQueueLock() {
         return queueLock;
     }
 
-    public static Stack<Order> getOrders() {
+    public static Deque<Order> getOrders() {
         return orders;
     }
 
@@ -50,25 +45,30 @@ public class DrinkMachine implements Runnable{
         DrinkMachine.queueMax = queueMax;
     }
 
+    public int getMachineId() {
+        return machineId;
+    }
+
     @Override
     public void run() {
         try {
             while (true) {
                 if (Client.getClientSem().tryAcquire()) {
                     queueLock.lock();
-                    Order order = orders.pop();
+                    Order order = orders.removeFirst();
                     --queueSize;
                     queueLock.unlock();
-                    System.out.println("Client " + order.client.getClientId() + " is waiting to get a " + order.drink);
-                    machineLock.lock();
                     Thread.sleep(500);
-                    System.out.println(order.drink + " was given to the client #" + order.client.getClientId());
-                    machineLock.unlock();
-                    machineSem.release();
-                } else Thread.sleep(1000);
+                    System.out.println(order.drink + " was given to the client " + order.client.getClientId());
+                } else {
+                    System.out.println("Machine " + (machineId + 1) + " is shleeping -_-zzz");
+                    Thread.sleep(1000);
+                }
             }
         } catch (InterruptedException e) {
-            System.out.println("DM WAS INTERRUPTED BRO");
+            System.out.println("MACHINE " + (machineId + 1) + " WAS INTERRUPTED BRO");
         }
     }
+
+
 }

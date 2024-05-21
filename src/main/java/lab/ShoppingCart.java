@@ -15,11 +15,11 @@ public class ShoppingCart {
 
 
     public Drink addDrink(DrinkFactory df, String manufacturer){
-        addDrink(df.getDrink(manufacturer));
-        return df.getDrink(manufacturer);
+        return addDrink(df.getDrink(manufacturer));
     }
-    public void addDrink(Drink item) {
+    public Drink addDrink(Drink item) {
         drinks.add(item);
+        return item;
     }
 
     public void removeDrink(Drink item) {
